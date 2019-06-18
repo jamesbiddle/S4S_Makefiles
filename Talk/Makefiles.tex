@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+  language=bash,
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  breaklines=true,
+  %postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+
+\begin{document}
+\title{Makefiles and You}
+\author{James Biddle}
+\maketitle
+\section{Part A}
+\begin{enumerate}
+\item Create a file called 'makefile', 'Makefile' or 'GNUmakefile'
+\item Make a target called 'target'
+\item Make it echo some text when run, highlight the fact that all you're doing with the makefile is executing bash commands.
+\item Note that to write a command it must be preceeded by a TAB
+\item Now make a new target called 'program.x', to compile 'program.f90'. Do not include dependency yet
+\item Edit 'program.f90' to write another line of text
+\item Type make and show that it doesn't recompile because there is no dependency specified.
+\item Add dependency to 'program.f90'
+\item Look at what happens if we just type make
+\item Add dummy 'all' target to run all targets
+\item Make 'clean' target to remove generated files
+\item Make a file called 'clean' and then type 'make clean'. Show that we get undesired behaviour
+\item Introduce a '.PHONY' target to resolve this behaviour
+\item We've written 'program' a lot, which introduces concerns for typos. We can resolve this with inbuilt variables:
+\pagebreak
+\begin{lstlisting}
+$@ to represent the full target name of the current target
+$? returns the dependencies that are newer than the current target
+$* returns the text that corresponds to % in the target
+$< returns the name of the first dependency
+$^ returns the names of all the dependencies with space as the delimiter
+\end{lstlisting}
+ 
+\end{enumerate}
+\end{document}

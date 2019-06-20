@@ -1,0 +1,5 @@
+module libmodB
+  implicit none
+  integer, parameter :: num = 5
+  
+end module libmodB

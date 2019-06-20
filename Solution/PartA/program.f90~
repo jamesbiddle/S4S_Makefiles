@@ -1,0 +1,9 @@
+program TestProgram
+  use modA
+  implicit none
+
+  write(*,*) "Hello S4S!"
+  ! write(*,*) "I am some more text"
+  call say_hi()
+  
+end program TestProgram

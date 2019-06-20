@@ -1,0 +1,16 @@
+program program
+  use modA
+  use modB
+  use libmodA
+  use libmodB
+  implicit none
+  real :: x,y
+
+  x = 3.0
+  
+  call say_hi()
+  call times2(x,y)
+  write(*,'(a,f8.6)') "pi = ", pi
+  write(*,'(a,i2)') "My number is", num
+  
+end program program

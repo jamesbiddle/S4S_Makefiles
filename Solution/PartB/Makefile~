@@ -1,0 +1,39 @@
+F90C=gfortran
+F90FLAGS=-O2
+
+#OBJS=modA.o modB.o
+
+# Get all .f90 files
+F90FILES=$(shell ls *.f90)
+# List non-object files
+PROG=program.f90
+# Remove non-object files from list
+OBJS=$(filter-out ${PROG} ,${F90FILES})
+# Replace .f90 with .o for object files
+OBJS:=$(OBJS:.f90=.o)
+
+all: program.x
+
+# modA.o: modA.f90
+# 	@echo "Making object file for " $<
+# 	${F90C} $< -c
+
+# modB.o: modB.f90
+# 	@echo "Making object file for " $<
+# 	${F90C} $< -c
+
+%.o: %.f90
+	@echo "Making object file for " $<
+	${F90C} ${F90FLAGS} $< -c
+
+program.x: program.f90 ${OBJS}
+	@echo "Compiling" $<
+	${F90C} ${F90FLAGS} $^ -o $@
+	@echo "Done"
+
+modB.o: modA.o
+
+clean:
+	rm *.x *.o *.mod
+
+.PHONY: clean all

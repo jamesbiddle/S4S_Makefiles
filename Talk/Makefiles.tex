@@ -16,20 +16,24 @@
 \maketitle
 \section{Part A}
 \begin{enumerate}
-\item Create a file called 'makefile', 'Makefile' or 'GNUmakefile'
-\item Make a target called 'target'
+\item Create a file called 'makefile', 'Makefile' or 'GNUmakefile'.
+\item Make a target called 'target'.
 \item Make it echo some text when run, highlight the fact that all you're doing with the makefile is executing bash commands.
-\item Note that to write a command it must be preceeded by a TAB
-\item Now make a new target called 'program.x', to compile 'program.f90'. Do not include dependency yet
-\item Edit 'program.f90' to write another line of text
+\item Note that to write a command it must be preceeded by a TAB.
+\item Now make a new target called 'program.x', to compile 'program.f90'. Do not include dependency yet.
+\item Edit 'program.f90' to write another line of text.
 \item Type make and show that it doesn't recompile because there is no dependency specified.
-\item Add dependency to 'program.f90'
-\item Look at what happens if we just type make
-\item Add dummy 'all' target to run all targets
-\item Make 'clean' target to remove generated files
-\item Make a file called 'clean' and then type 'make clean'. Show that we get undesired behaviour
-\item Introduce a '.PHONY' target to resolve this behaviour
-\item We've written 'program' a lot, which introduces concerns for typos. We can resolve this with inbuilt variables:
+\item Add dependency to 'program.f90'.
+\item Look at what happens if we just type make.
+\item Add dummy 'all' target to run all targets.
+\item Make 'clean' target to remove generated files.
+\item Make a file called 'clean' and then type 'make clean'. Show that we get undesired behaviour.
+\item Introduce a '.PHONY' target to resolve this behaviour.
+\item We've been using gfortran as our compiler, so instead of writing this out we can ensure consistency by putting this in a variable 'F90C'.
+\item Variables are used by writing \begin{lstlisting}
+${varname}
+\end{lstlisting}
+\item We've written 'program' a lot as well, which introduces concerns for typos. We can resolve this with inbuilt variables:
 \pagebreak
 \begin{lstlisting}
 $@ to represent the full target name of the current target
@@ -40,4 +44,41 @@ $^ returns the names of all the dependencies with space as the delimiter
 \end{lstlisting}
  
 \end{enumerate}
+
+\section{PartB}
+\begin{enumerate}
+\item Now we're going to look at a more complicated example, where we use variables to simplify and streamline our makefile.
+\item We have a main program that is also dependent on two modules, with one of the modules dependent on the other.
+\item We need to compile our module files into object files, then compile our main program into the executable, ensuring that everything is done in the correct order.
+\item First let's compile the module files into object files that can then be linked when we make the executable.
+\item We could explicitly type out the rule for each module, or we could use pattern matching. This is because the rule to make '.o' files is the same every time.
+\item We also have to add the '.o' files to the dependency list of 'program.x', as well as change our inbuilt variable to reference all the dependencies.
+\item Finally, we need to set the dependencies of the modules, in this case modB depends on modA.
+\item Demonstrate that swapping the dependency order doesn't change the compile order due to the dependencies.
+\item Move objects into 'OBJS' variable.
+\item Demonstrate automatic object variable creation via makefile and shell commands.
+\item Demonstrate including dependencies through an include statement. 
+\end{enumerate}
+
+\section{Part C}
+\begin{enumerate}
+\item Now we want to look at a multi-directory structure, with three folders: bin, src, and lib.
+\item bin contains our final programs source code, and will contain our executables at the end of compilation.
+\item src contains our modules.
+\item lib, if we have enough time, will contain library files that allow us to bundle modules.
+\item First, let's set up our top level makefile to go into each directory and type 'make'.
+\item Make variables for each subdirectory, and make a 'SUBDIR' variable to hold the full collection.
+\item Introduce the 'MAKE' variable and use it to enter the subdirectories and type make.
+\item Make bin depend on src
+\item Make a 'clean' target that loops through each directory and runs 'make clean'
+\item Add our .PHONY target.
+\item Now we simply make use of our makefile from the previous section in the src directory. Here we can just make an OBJS variable from all the files in the directory.
+\item To compile our main program, we need to get a list of the object files, as well as add an include flag to tell the compiler where it can find the .mod files.
+\item Now we will talk about dynamic and static libraries as well as how we can compile and link to them.
+\item Libraries are useful for bundling large code bases into easy to use blocks. We can then reference the modules, functions and subroutines contained within them.
+\item Once compiled, we don't need to worry about cross-dependencies within the library, so we are free to use the modules we want without worrying about their individual dependencies.
+\item Static libraries are compiled with the code, so if the library changes the code must be recompiled. They add to the size of the executable as it bundles all used and unused routines. They are however faster as they don't require calls to external sources.
+\item Dynamic libraries are accessed at runtime, meaning that if the library changes the executable doesn't have to. This can save space and re-compilation time. It does introduce another possible source of corruption or error into the code, as the program may run even if the library is faulty.
+\end{enumerate}
+
 \end{document}

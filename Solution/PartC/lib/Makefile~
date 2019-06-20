@@ -1,0 +1,20 @@
+F90C = gfortran
+DYNLIBFLAGS = -fpic -shared
+
+SRC = $(shell ls *.f90)
+OBJS = $(SRC:.f90=.o)
+
+all: libtest.so
+
+%.o: %.f90
+	${F90C} ${DYNLIBFLAGS} $< -c
+
+libtest.so: ${OBJS}
+	${F90C} -shared $^ -o $@
+
+libmodA.o: libmodB.o
+
+clean:
+	rm *.mod *.a *.o *.so*
+
+.PHONY: clean all

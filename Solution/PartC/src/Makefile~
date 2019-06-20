@@ -1,0 +1,16 @@
+F90C = gfortran
+F90FLAGS = #-O2
+SRC=$(shell ls *.f90)
+OBJS=$(SRC:.f90=.o)
+
+all: ${OBJS}
+
+%.o: %.f90
+	${F90C} ${F90FLAGS} $< -c
+
+modB.o: modA.o
+
+clean:
+	rm *.o *.mod
+
+.PHONY: all clean

@@ -7,6 +7,6 @@ program.x: program.f90
 	@${F90C} $< -o $@
 
 clean:
-	rm *.x
+	rm -f *.x
 
 .PHONY: clean all

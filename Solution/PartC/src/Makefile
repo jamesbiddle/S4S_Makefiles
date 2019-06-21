@@ -11,6 +11,6 @@ all: ${OBJS}
 modB.o: modA.o
 
 clean:
-	rm *.o *.mod
+	rm -f *.o *.mod
 
 .PHONY: all clean

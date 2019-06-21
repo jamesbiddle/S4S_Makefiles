@@ -3,6 +3,7 @@ F90FLAGS=-O2
 
 OBJS=modB.o modA.o
 
+# Alternative way to auto-generate object list
 # Get all .f90 files
 F90FILES=$(shell ls *.f90)
 # List non-object files
@@ -34,7 +35,7 @@ program.x: program.f90 ${OBJS}
 #modB.o: modA.o
 
 clean:
-	rm *.x *.o *.mod
+	rm -f *.x *.o *.mod
 
 .PHONY: clean all
 

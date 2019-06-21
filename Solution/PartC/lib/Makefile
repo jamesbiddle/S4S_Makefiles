@@ -15,6 +15,6 @@ libtest.so: ${OBJS}
 libmodA.o: libmodB.o
 
 clean:
-	rm *.mod *.a *.o *.so*
+	rm -f *.mod *.a *.o *.so*
 
 .PHONY: clean all

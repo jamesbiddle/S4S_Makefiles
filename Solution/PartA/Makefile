@@ -1,6 +1,7 @@
 F90C=gfortran
+F90FLAGS=-O2
 
-all: betterprogram.x program.x target.x
+all: betterprogram.x program.x target
 
 target:
 	@echo "Hello World"
@@ -11,9 +12,9 @@ program.x: program.f90
 
 betterprogram.x: program.f90
 	@echo "Compiling" $<
-	@${F90C} $< -o $@
+	@${F90C} ${F90FLAGS} $< -o $@
 
 clean:
-	rm *.x
+	rm -f *.x
 
 .PHONY: target all clean

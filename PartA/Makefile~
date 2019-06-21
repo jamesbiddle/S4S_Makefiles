@@ -1,6 +1,0 @@
-target:
-	@echo "I am a target"
-
-program.x: program.f90
-	@echo "Compiling Target"
-	gfortran program.f90 -o program.x

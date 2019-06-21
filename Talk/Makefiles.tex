@@ -44,7 +44,30 @@ $^ returns the names of all the dependencies with space as the delimiter
 \end{lstlisting}
  
 \end{enumerate}
+{\bf Solution:}
+\begin{lstlisting}
+F90C=gfortran
+F90FLAGS=-O2
 
+all: betterprogram.x program.x target
+
+target:
+	@echo "Hello World"
+
+program.x: program.f90
+	@echo "Compiling program.f90" 
+	gfortran program.f90 -o program.x
+
+betterprogram.x: program.f90
+	@echo "Compiling" $<
+	@${F90C} ${F90FLAGS} $< -o $@
+
+clean:
+	rm -f *.x
+
+.PHONY: target all clean
+\end{lstlisting}
+\pagebreak
 \section{PartB}
 \begin{enumerate}
 \item Now we're going to look at a more complicated example, where we use variables to simplify and streamline our makefile.
@@ -60,6 +83,54 @@ $^ returns the names of all the dependencies with space as the delimiter
 \item Demonstrate including dependencies through an include statement. 
 \end{enumerate}
 
+{\bf Solution:}
+
+\begin{lstlisting}
+F90C=gfortran
+F90FLAGS=-O2
+
+OBJS=modB.o modA.o
+
+# Alternative way to auto-generate object list
+# Get all .f90 files
+F90FILES=$(shell ls *.f90)
+# List non-object files
+PROG=program.f90
+# Remove non-object files from list
+# OBJS=$(filter-out ${PROG} ,${F90FILES})
+# Replace .f90 with .o for object files
+# OBJS:=$(OBJS:.f90=.o)
+
+all: program.x
+
+# modA.o: modA.f90
+# 	@echo "Making object file for " $<
+# 	${F90C} $< -c
+
+# modB.o: modB.f90
+# 	@echo "Making object file for " $<
+# 	${F90C} $< -c
+
+%.o: %.f90
+	@echo "Making object file for " $<
+	${F90C} ${F90FLAGS} $< -c
+
+program.x: program.f90 ${OBJS}
+	@echo "Compiling" $<
+	${F90C} ${F90FLAGS} $^ -o $@
+	@echo "Done"
+
+#modB.o: modA.o
+
+clean:
+	rm -f *.x *.o *.mod
+
+.PHONY: clean all
+
+include depends.mk
+
+\end{lstlisting}
+\pagebreak
 \section{Part C}
 \begin{enumerate}
 \item Now we want to look at a multi-directory structure, with three folders: bin, src, and lib.
@@ -79,6 +150,100 @@ $^ returns the names of all the dependencies with space as the delimiter
 \item Once compiled, we don't need to worry about cross-dependencies within the library, so we are free to use the modules we want without worrying about their individual dependencies.
 \item Static libraries are compiled with the code, so if the library changes the code must be recompiled. They add to the size of the executable as it bundles all used and unused routines. They are however faster as they don't require calls to external sources.
 \item Dynamic libraries are accessed at runtime, meaning that if the library changes the executable doesn't have to. This can save space and re-compilation time. It does introduce another possible source of corruption or error into the code, as the program may run even if the library is faulty.
+\item Static libraries are easier to compile, dynamic libraries are somewhat trickier.
+\item First we compile all our .o files, but with two new flags -fpic and -shared.
+\item Then bundle them into a library file with the same flags.
+\item In the bin folder we need to include the lib directory, as well as add the -L flag to link to the library specified with the -l command. Note that we omit 'lib' and '.so' from the library name.
+\item Because it's used at runtime, we also need to tell our program where to find the library.
+\item Showcase the fact that if we change the library, the program changes without recompiling. 
 \end{enumerate}
+
+{\bf Solution (top):}
+\begin{lstlisting}
+BIN = ./bin/
+SRC = ./src/
+LIB = ./lib/
+SUBDIRS = ${BIN} ${SRC} ${LIB}
+
+all: ${SUBDIRS}
+
+${SUBDIRS}:
+	${MAKE} -C $@
+
+${BIN}: ${SRC} ${LIB}
+
+clean:
+	$(foreach dir, ${SUBDIRS}, ${MAKE} -C ${dir} clean;)
+
+.PHONY: clean all ${SUBDIRS}
+
+\end{lstlisting}
+
+{\bf Solution (bin):}
+\begin{lstlisting}
+F90C = gfortran
+F90FLAGS = -O2
+LIBDIR = ./../lib
+SRCDIR = ./../src
+LINK = -L${LIBDIR} -Wl,-rpath,'$$ORIGIN/../lib'
+LIB = -ltest
+INCLUDE = -I${LIBDIR} -I${SRCDIR}
+
+OBJS=$(shell ls ${SRCDIR}/*.o)
+
+all: program.x
+
+program.x: program.f90 ${OBJS}
+	${F90C} ${F90FLAGS} ${LINK} $^ ${LIB} ${INCLUDE} -o $@
+
+clean:
+	rm -f *.x
+\end{lstlisting}
+
+{\bf Solution (src):}
+\begin{lstlisting}
+F90C = gfortran
+F90FLAGS = -O2
+SRC=$(shell ls *.f90)
+OBJS=$(SRC:.f90=.o)
+
+all: ${OBJS}
+
+%.o: %.f90
+	${F90C} ${F90FLAGS} $< -c
+
+modB.o: modA.o
+
+clean:
+	rm -f *.o *.mod
+
+.PHONY: all clean
+
+\end{lstlisting}
+
+{\bf Solution (lib):}
+\begin{lstlisting}
+F90C = gfortran
+LDFLAGS = -fpic -shared
+
+SRC = $(shell ls *.f90)
+OBJS = $(SRC:.f90=.o)
+
+all: libtest.so
+
+%.o: %.f90
+	${F90C} ${LDFLAGS} $< -c
+
+libtest.so: ${OBJS}
+	${F90C} ${LDFLAGS} $^ -o $@ 
+
+libmodA.o: libmodB.o
+
+clean:
+	rm -f *.mod *.a *.o *.so*
+
+.PHONY: clean all
+
+\end{lstlisting}
 
 \end{document}
